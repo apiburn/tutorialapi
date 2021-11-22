@@ -11,6 +11,7 @@ import org.glassfish.jersey.servlet.ServletContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static java.util.Optional.ofNullable;
 import static org.eclipse.jetty.http.HttpScheme.HTTPS;
 import static org.eclipse.jetty.http.HttpVersion.HTTP_1_1;
 import static org.eclipse.jetty.servlet.ServletContextHandler.NO_SESSIONS;
@@ -19,9 +20,11 @@ public class TutorialApiServer {
     private static final Logger LOGGER = LoggerFactory.getLogger(TutorialApiServer.class);
 
     public static void main(String... args) throws Exception {
+        int port = ofNullable(System.getProperty("port")).map(Integer::parseInt).orElse(8443);
+
         HttpConfiguration httpsConfiguration = new HttpConfiguration();
         httpsConfiguration.setSecureScheme(HTTPS.asString());
-        httpsConfiguration.setSecurePort(8443);
+        httpsConfiguration.setSecurePort(port);
         httpsConfiguration.addCustomizer(new SecureRequestCustomizer());
         httpsConfiguration.setSendServerVersion(false);
         httpsConfiguration.setSendDateHeader(false);
@@ -55,7 +58,7 @@ public class TutorialApiServer {
         ServletHolder apiServletHolder = servletContextHandler.addServlet(ServletContainer.class, "/api/*");
         apiServletHolder.setInitParameter("jakarta.ws.rs.Application", ApiApplication.class.getName());
 
-        LOGGER.info("Server starting");
+        LOGGER.info("Server starting on port: {}", port);
         server.start();
         server.join();
     }
