@@ -1,6 +1,12 @@
 package com.tutorialapi.server;
 
 import com.tutorialapi.rest.ApiApplication;
+import com.tutorialapi.server.config.ConfigKey;
+import com.tutorialapi.server.config.SystemKey;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
+import org.eclipse.jetty.http.HttpScheme;
+import org.eclipse.jetty.http.HttpVersion;
 import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.servlet.ServletContextHandler;
@@ -11,19 +17,20 @@ import org.glassfish.jersey.servlet.ServletContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static java.util.Optional.ofNullable;
-import static org.eclipse.jetty.http.HttpScheme.HTTPS;
-import static org.eclipse.jetty.http.HttpVersion.HTTP_1_1;
-import static org.eclipse.jetty.servlet.ServletContextHandler.NO_SESSIONS;
+import java.io.IOException;
+import java.net.URL;
+import java.util.Optional;
 
 public class TutorialApiServer {
     private static final Logger LOGGER = LoggerFactory.getLogger(TutorialApiServer.class);
 
-    public static void main(String... args) throws Exception {
-        int port = ofNullable(System.getProperty("port")).map(Integer::parseInt).orElse(8443);
+    private static final String ROOT_CONTEXT = "/";
+    private static final String API_PATTERN = "/api/*";
+    private static final String APPLICATION_INIT_PARAM_KEY = "jakarta.ws.rs.Application";
 
+    private static Server createJettyServer(int port, Config config) throws IOException {
         HttpConfiguration httpsConfiguration = new HttpConfiguration();
-        httpsConfiguration.setSecureScheme(HTTPS.asString());
+        httpsConfiguration.setSecureScheme(HttpScheme.HTTPS.asString());
         httpsConfiguration.setSecurePort(port);
         httpsConfiguration.addCustomizer(new SecureRequestCustomizer());
         httpsConfiguration.setSendServerVersion(false);
@@ -32,31 +39,45 @@ public class TutorialApiServer {
         HttpConnectionFactory httpsConnectionFactory = new HttpConnectionFactory(httpsConfiguration);
 
         SslContextFactory.Server sslContextFactory = new SslContextFactory.Server();
-        sslContextFactory.setKeyStorePath("tutorialapi-server/src/main/resources/certs/tutorialapi.p12");
-        sslContextFactory.setKeyStoreType("PKCS12");
-        sslContextFactory.setKeyStorePassword("changeit");
-        sslContextFactory.setKeyManagerPassword("changeit");
+        sslContextFactory.setKeyStorePath(config.getString(ConfigKey.SERVER_KEYSTORE_FILE.getKey()));
+        sslContextFactory.setKeyStoreType(config.getString(ConfigKey.SERVER_KEYSTORE_TYPE.getKey()));
+        sslContextFactory.setKeyStorePassword(config.getString(ConfigKey.SERVER_KEYSTORE_PASSWORD.getKey()));
+        sslContextFactory.setKeyManagerPassword(config.getString(ConfigKey.SERVER_KEYSTORE_PASSWORD.getKey()));
         sslContextFactory.setTrustAll(true);
 
-        SslConnectionFactory sslConnectionFactory = new SslConnectionFactory(sslContextFactory, HTTP_1_1.asString());
+        SslConnectionFactory sslConnectionFactory =
+                new SslConnectionFactory(sslContextFactory, HttpVersion.HTTP_1_1.asString());
 
         Server server = new Server();
 
         ServerConnector httpsConnector = new ServerConnector(server, sslConnectionFactory, httpsConnectionFactory);
-        httpsConnector.setName("secure");
         httpsConnector.setPort(httpsConfiguration.getSecurePort());
 
         server.addConnector(httpsConnector);
 
-        ServletContextHandler servletContextHandler = new ServletContextHandler(NO_SESSIONS);
-        servletContextHandler.setContextPath("/");
-        servletContextHandler.setBaseResource(Resource.newResource("tutorialapi-server/src/main/resources/www"));
-        servletContextHandler.addServlet(DefaultServlet.class, "/");
+        ServletContextHandler servletContextHandler = new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
+        servletContextHandler.setContextPath(ROOT_CONTEXT);
+        servletContextHandler.setBaseResource(Resource.newResource(config.getString(ConfigKey.SERVER_WEB_CONTENT.getKey())));
+        servletContextHandler.addServlet(DefaultServlet.class, ROOT_CONTEXT);
 
         server.setHandler(servletContextHandler);
 
-        ServletHolder apiServletHolder = servletContextHandler.addServlet(ServletContainer.class, "/api/*");
-        apiServletHolder.setInitParameter("jakarta.ws.rs.Application", ApiApplication.class.getName());
+        ServletHolder apiServletHolder = servletContextHandler.addServlet(ServletContainer.class, API_PATTERN);
+        apiServletHolder.setInitParameter(APPLICATION_INIT_PARAM_KEY, ApiApplication.class.getName());
+
+        return server;
+    }
+
+    public static void main(String... args) throws Exception {
+        int port = Integer.parseInt(Optional.ofNullable(System.getProperty(SystemKey.PORT.getKey()))
+                .orElse(SystemKey.PORT.getDefaultValue()));
+        String mode = Optional.ofNullable(System.getProperty(SystemKey.MODE.getKey()))
+                .orElse(SystemKey.MODE.getDefaultValue());
+
+        String url = String.format("https://raw.githubusercontent.com/apiburn/tutorialapi/main/system-%s.properties", mode);
+        Config config = ConfigFactory.parseURL(new URL(url));
+
+        Server server = createJettyServer(port, config);
 
         LOGGER.info("Server starting on port: {}", port);
         server.start();
