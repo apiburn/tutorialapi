@@ -21,8 +21,13 @@ public class TestResourceTest extends JerseyTest {
 
     @Test
     public void test() {
-        Response response = target("/test").request().get();
+        Response response = target("/test/hello").request().get();
 
         Assertions.assertEquals(200, response.getStatus());
+        Assertions.assertEquals("Hello", response.readEntity(String.class));
+
+        Assertions.assertEquals("*", response.getHeaderString("Access-Control-Allow-Origin"));
+        Assertions.assertEquals("DELETE, HEAD, GET, OPTIONS, PATCH, POST, PUT",
+                response.getHeaderString("Access-Control-Allow-Methods"));
     }
 }
