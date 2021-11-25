@@ -1,4 +1,4 @@
-package com.tutorialapi.model;
+package com.tutorialapi.model.user;
 
 import java.security.Principal;
 import java.util.Objects;

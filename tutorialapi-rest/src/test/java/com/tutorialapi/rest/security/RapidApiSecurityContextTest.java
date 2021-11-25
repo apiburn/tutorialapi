@@ -1,7 +1,7 @@
 package com.tutorialapi.rest.security;
 
-import com.tutorialapi.model.RapidApiPrincipal;
-import com.tutorialapi.model.Subscription;
+import com.tutorialapi.model.user.RapidApiPrincipal;
+import com.tutorialapi.model.user.Subscription;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

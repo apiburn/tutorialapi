@@ -1,7 +1,7 @@
 package com.tutorialapi.rest.security;
 
-import com.tutorialapi.model.RapidApiPrincipal;
-import com.tutorialapi.model.Subscription;
+import com.tutorialapi.model.user.RapidApiPrincipal;
+import com.tutorialapi.model.user.Subscription;
 import jakarta.ws.rs.NotAuthorizedException;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.MultivaluedHashMap;

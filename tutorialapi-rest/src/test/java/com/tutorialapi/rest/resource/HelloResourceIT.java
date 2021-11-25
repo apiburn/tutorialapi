@@ -1,6 +1,6 @@
 package com.tutorialapi.rest.resource;
 
-import com.tutorialapi.model.Subscription;
+import com.tutorialapi.model.user.Subscription;
 import com.tutorialapi.rest.ApiApplication;
 import com.tutorialapi.rest.exception.ErrorResponse;
 import com.tutorialapi.rest.security.SecurityHeader;

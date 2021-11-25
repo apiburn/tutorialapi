@@ -1,4 +1,4 @@
-package com.tutorialapi.model;
+package com.tutorialapi.model.user;
 
 import java.util.Optional;
 

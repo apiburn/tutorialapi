@@ -1,5 +1,7 @@
 package com.tutorialapi.model;
 
+import com.tutorialapi.model.user.RapidApiPrincipal;
+import com.tutorialapi.model.user.Subscription;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

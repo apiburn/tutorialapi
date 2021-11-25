@@ -1,6 +1,6 @@
 package com.tutorialapi.rest.security;
 
-import com.tutorialapi.model.RapidApiPrincipal;
+import com.tutorialapi.model.user.RapidApiPrincipal;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerRequestFilter;
 import jakarta.ws.rs.ext.Provider;
