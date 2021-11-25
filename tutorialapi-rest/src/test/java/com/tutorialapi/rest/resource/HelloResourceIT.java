@@ -2,8 +2,10 @@ package com.tutorialapi.rest.resource;
 
 import com.tutorialapi.model.Subscription;
 import com.tutorialapi.rest.ApiApplication;
+import com.tutorialapi.rest.exception.ErrorResponse;
 import com.tutorialapi.rest.security.SecurityHeader;
 import jakarta.ws.rs.core.Application;
+import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.glassfish.jersey.test.JerseyTest;
 import org.junit.jupiter.api.Assertions;
@@ -26,7 +28,11 @@ public class HelloResourceIT extends JerseyTest {
         Response response = target("/test").request().get();
 
         Assertions.assertEquals(401, response.getStatus());
-        Assertions.assertEquals("", response.readEntity(String.class));
+        Assertions.assertEquals(MediaType.APPLICATION_JSON_TYPE, response.getMediaType());
+
+        ErrorResponse errorResponse = response.readEntity(ErrorResponse.class);
+        Assertions.assertEquals(401, errorResponse.getStatus());
+        Assertions.assertEquals("Missing security header: X-RapidAPI-Proxy-Secret", errorResponse.getMessage());
     }
 
     @Test
@@ -36,7 +42,11 @@ public class HelloResourceIT extends JerseyTest {
                 .get();
 
         Assertions.assertEquals(401, response.getStatus());
-        Assertions.assertEquals("", response.readEntity(String.class));
+        Assertions.assertEquals(MediaType.APPLICATION_JSON_TYPE, response.getMediaType());
+
+        ErrorResponse errorResponse = response.readEntity(ErrorResponse.class);
+        Assertions.assertEquals(401, errorResponse.getStatus());
+        Assertions.assertEquals("Missing security header: X-RapidAPI-User", errorResponse.getMessage());
     }
 
     @Test
@@ -47,7 +57,12 @@ public class HelloResourceIT extends JerseyTest {
                 .get();
 
         Assertions.assertEquals(401, response.getStatus());
-        Assertions.assertEquals("", response.readEntity(String.class));
+        Assertions.assertEquals(MediaType.APPLICATION_JSON_TYPE, response.getMediaType());
+
+        ErrorResponse errorResponse = response.readEntity(ErrorResponse.class);
+        Assertions.assertEquals(401, errorResponse.getStatus());
+        Assertions.assertEquals("Missing or invalid security header: X-RapidAPI-Subscription",
+                errorResponse.getMessage());
     }
 
     @Test
@@ -59,7 +74,12 @@ public class HelloResourceIT extends JerseyTest {
                 .get();
 
         Assertions.assertEquals(401, response.getStatus());
-        Assertions.assertEquals("", response.readEntity(String.class));
+        Assertions.assertEquals(MediaType.APPLICATION_JSON_TYPE, response.getMediaType());
+
+        ErrorResponse errorResponse = response.readEntity(ErrorResponse.class);
+        Assertions.assertEquals(401, errorResponse.getStatus());
+        Assertions.assertEquals("Missing or invalid security header: X-RapidAPI-Subscription",
+                errorResponse.getMessage());
     }
 
     @Test
@@ -71,6 +91,7 @@ public class HelloResourceIT extends JerseyTest {
                 .get();
 
         Assertions.assertEquals(200, response.getStatus());
+        Assertions.assertEquals(MediaType.TEXT_PLAIN_TYPE, response.getMediaType());
         Assertions.assertEquals("Hello", response.readEntity(String.class));
 
         Assertions.assertEquals("*", response.getHeaderString("Access-Control-Allow-Origin"));

@@ -10,6 +10,6 @@
     </root>
 
     <logger name="access-log" level="WARN"/>
-    <logger name="com.tutorialapi" level="INFO"/>
+    <logger name="com.tutorialapi" level="OFF"/>
     <logger name="org.eclipse.jetty" level="WARN"/>
 </configuration>

@@ -23,6 +23,12 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- Used for JSON annotations -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+        </dependency>
+
         <!-- Used for JAX-RS REST api -->
         <dependency>
             <groupId>jakarta.ws.rs</groupId>
@@ -52,6 +58,17 @@
                 <exclusion>
                     <groupId>org.glassfish.hk2.external</groupId>
                     <artifactId>aopalliance-repackaged</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-json-jackson</artifactId>
+            <exclusions>
+                <!-- Using newer version from jaxb-runtime -->
+                <exclusion>
+                    <groupId>jakarta.xml.bind</groupId>
+                    <artifactId>jakarta.xml.bind-api</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

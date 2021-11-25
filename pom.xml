@@ -37,6 +37,14 @@
             </dependency>
 
             <dependency>
+                <groupId>com.fasterxml.jackson</groupId>
+                <artifactId>jackson-bom</artifactId>
+                <version>2.13.0</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
                 <groupId>com.typesafe</groupId>
                 <artifactId>config</artifactId>
                 <version>1.4.1</version>
@@ -159,6 +167,7 @@
                             <ignoredUnusedDeclaredDependency>org.eclipse.jetty:jetty-annotations</ignoredUnusedDeclaredDependency>
                             <ignoredUnusedDeclaredDependency>org.glassfish.jaxb:jaxb-runtime</ignoredUnusedDeclaredDependency>
                             <ignoredUnusedDeclaredDependency>org.glassfish.jersey.inject:jersey-hk2</ignoredUnusedDeclaredDependency>
+                            <ignoredUnusedDeclaredDependency>org.glassfish.jersey.media:jersey-media-json-jackson</ignoredUnusedDeclaredDependency>
                             <ignoredUnusedDeclaredDependency>org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-jetty</ignoredUnusedDeclaredDependency>
                         </ignoredUnusedDeclaredDependencies>
                     </configuration>
