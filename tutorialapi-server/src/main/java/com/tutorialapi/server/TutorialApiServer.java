@@ -1,8 +1,8 @@
 package com.tutorialapi.server;
 
 import com.tutorialapi.rest.ApiApplication;
-import com.tutorialapi.server.config.ConfigKey;
-import com.tutorialapi.server.config.SystemKey;
+import com.tutorialapi.model.config.ConfigKey;
+import com.tutorialapi.model.config.SystemKey;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.eclipse.jetty.http.HttpScheme;
@@ -14,7 +14,6 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.glassfish.jersey.servlet.ServletContainer;
-import org.glassfish.jersey.servlet.ServletProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,8 +61,8 @@ public class TutorialApiServer {
 
         server.setHandler(servletContextHandler);
 
-        ServletHolder apiServletHolder = servletContextHandler.addServlet(ServletContainer.class, API_PATTERN);
-        apiServletHolder.setInitParameter(ServletProperties.JAXRS_APPLICATION_CLASS, ApiApplication.class.getName());
+        ServletHolder apiServletHolder = new ServletHolder(new ServletContainer(new ApiApplication(config)));
+        servletContextHandler.addServlet(apiServletHolder, API_PATTERN);
 
         return server;
     }

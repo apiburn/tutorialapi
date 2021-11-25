@@ -1,4 +1,4 @@
-package com.tutorialapi.server.config;
+package com.tutorialapi.model.config;
 
 public enum SystemKey implements Key {
     PORT("8443"),

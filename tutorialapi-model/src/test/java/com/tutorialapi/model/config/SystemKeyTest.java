@@ -1,4 +1,4 @@
-package com.tutorialapi.server.config;
+package com.tutorialapi.model.config;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

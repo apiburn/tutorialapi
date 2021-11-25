@@ -1,4 +1,4 @@
-package com.tutorialapi.server.config;
+package com.tutorialapi.model.config;
 
 import static java.util.Locale.ENGLISH;
 

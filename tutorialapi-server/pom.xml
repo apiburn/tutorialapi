@@ -13,6 +13,10 @@
         <!-- Project dependencies -->
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>tutorialapi-model</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>tutorialapi-rest</artifactId>
         </dependency>
 
@@ -72,13 +76,6 @@
         <dependency>
             <groupId>org.glassfish.jersey.containers</groupId>
             <artifactId>jersey-container-servlet-core</artifactId>
-        </dependency>
-
-        <!-- Used for testing -->
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-            <scope>test</scope>
         </dependency>
 
         <!-- Used for logging -->

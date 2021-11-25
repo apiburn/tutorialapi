@@ -1,16 +1,21 @@
 package com.tutorialapi.rest.resource;
 
+import com.tutorialapi.model.config.ConfigKey;
 import com.tutorialapi.model.user.Subscription;
 import com.tutorialapi.rest.ApiApplication;
 import com.tutorialapi.rest.exception.ErrorResponse;
 import com.tutorialapi.rest.security.SecurityHeader;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import jakarta.ws.rs.core.Application;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.glassfish.jersey.test.JerseyTest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.sqlite.JDBC;
 
+import java.util.Properties;
 import java.util.logging.LogManager;
 
 public class HelloResourceIT extends JerseyTest {
@@ -20,7 +25,14 @@ public class HelloResourceIT extends JerseyTest {
 
     @Override
     protected Application configure() {
-        return new ApiApplication();
+        Properties properties = new Properties();
+        properties.setProperty(ConfigKey.DB_DRIVER.getKey(), JDBC.class.getName());
+        properties.setProperty(ConfigKey.DB_URL.getKey(), "jdbc:sqlite::memory:");
+        properties.setProperty(ConfigKey.DB_USERNAME.getKey(), "");
+        properties.setProperty(ConfigKey.DB_PASSWORD.getKey(), "");
+
+        Config config = ConfigFactory.parseProperties(properties);
+        return new ApiApplication(config);
     }
 
     @Test
