@@ -10,6 +10,12 @@
     <artifactId>tutorialapi-rest</artifactId>
 
     <dependencies>
+        <!-- Project dependencies -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>tutorialapi-model</artifactId>
+        </dependency>
+
         <!-- Logging implementation -->
         <dependency>
             <groupId>ch.qos.logback</groupId>
@@ -93,6 +99,12 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
             <scope>test</scope>
         </dependency>
 

@@ -12,12 +12,18 @@
     </properties>
 
     <modules>
+        <module>tutorialapi-model</module>
         <module>tutorialapi-rest</module>
         <module>tutorialapi-server</module>
     </modules>
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>tutorialapi-model</artifactId>
+                <version>${project.version}</version>
+            </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>tutorialapi-rest</artifactId>
@@ -86,6 +92,13 @@
                 <groupId>org.junit.jupiter</groupId>
                 <artifactId>junit-jupiter-api</artifactId>
                 <version>5.8.1</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-core</artifactId>
+                <version>4.1.0</version>
                 <scope>test</scope>
             </dependency>
 
