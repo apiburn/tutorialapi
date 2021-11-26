@@ -1,8 +1,8 @@
-package com.tutorialapi.rest.resource.v1.lists;
+package com.tutorialapi.rest.resource.v1.items;
 
 import com.tutorialapi.db.ServiceFactory;
-import com.tutorialapi.db.service.TodoListService;
-import com.tutorialapi.model.TodoList;
+import com.tutorialapi.db.service.TodoItemService;
+import com.tutorialapi.model.TodoItem;
 import com.tutorialapi.model.user.RapidApiPrincipal;
 import com.tutorialapi.model.user.Subscription;
 import com.tutorialapi.rest.ApiApplication;
@@ -23,65 +23,65 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 
-public class GetAllTodoListsResourceIT extends BaseResourceIT {
-    private TodoListService todoListService;
+public class GetAllTodoItemsResourceIT extends BaseResourceIT {
+    private TodoItemService todoItemService;
 
     @Override
     protected Application configure() {
         ServiceFactory serviceFactory = Mockito.mock(ServiceFactory.class);
-        todoListService = Mockito.mock(TodoListService.class);
-        Mockito.when(serviceFactory.getTodoListService()).thenReturn(todoListService);
+        todoItemService = Mockito.mock(TodoItemService.class);
+        Mockito.when(serviceFactory.getTodoItemService()).thenReturn(todoItemService);
 
         return new ApiApplication(serviceFactory);
     }
 
     @Test
     public void testNoSecurityHeaders() {
-        Response response = target("/v1/lists").request().get();
+        Response response = target("/v1/lists/list-id/items").request().get();
         verifyErrorResponse(response, Response.Status.UNAUTHORIZED.getStatusCode(),
                 "Missing security header: X-RapidAPI-Proxy-Secret");
-        Mockito.verify(todoListService, Mockito.times(0)).getAll(any());
+        Mockito.verify(todoItemService, Mockito.times(0)).getAll(any(), any());
     }
 
     @Test
     public void testOnlyProxySecretHeader() {
-        Response response = target("/v1/lists").request()
+        Response response = target("/v1/lists/list-id/items").request()
                 .header(SecurityHeader.RAPID_API_PROXY_SECRET.getHeader(), "proxy-secret")
                 .get();
         verifyErrorResponse(response, Response.Status.UNAUTHORIZED.getStatusCode(),
                 "Missing security header: X-RapidAPI-User");
-        Mockito.verify(todoListService, Mockito.times(0)).getAll(any());
+        Mockito.verify(todoItemService, Mockito.times(0)).getAll(any(), any());
     }
 
     @Test
     public void testProxySecretAndUserHeader() {
-        Response response = target("/v1/lists").request()
+        Response response = target("/v1/lists/list-id/items").request()
                 .header(SecurityHeader.RAPID_API_PROXY_SECRET.getHeader(), "proxy-secret")
                 .header(SecurityHeader.RAPID_API_USER.getHeader(), "user")
                 .get();
         verifyErrorResponse(response, Response.Status.UNAUTHORIZED.getStatusCode(),
                 "Missing or invalid security header: X-RapidAPI-Subscription");
-        Mockito.verify(todoListService, Mockito.times(0)).getAll(any());
+        Mockito.verify(todoItemService, Mockito.times(0)).getAll(any(), any());
     }
 
     @Test
     public void testInvalidSubscription() {
-        Response response = target("/v1/lists").request()
+        Response response = target("/v1/lists/list-id/items").request()
                 .header(SecurityHeader.RAPID_API_PROXY_SECRET.getHeader(), "proxy-secret")
                 .header(SecurityHeader.RAPID_API_USER.getHeader(), "user")
                 .header(SecurityHeader.RAPID_API_SUBSCRIPTION.getHeader(), "invalid")
                 .get();
         verifyErrorResponse(response, Response.Status.UNAUTHORIZED.getStatusCode(),
                 "Missing or invalid security header: X-RapidAPI-Subscription");
-        Mockito.verify(todoListService, Mockito.times(0)).getAll(any());
+        Mockito.verify(todoItemService, Mockito.times(0)).getAll(any(), any());
     }
 
     @Test
-    public void testNoTodoLists() {
+    public void testNoTodoItems() {
         RapidApiPrincipal principal = new RapidApiPrincipal("proxy-secret", "user", Subscription.BASIC);
-        Mockito.when(todoListService.getAll(eq(principal))).thenReturn(Collections.emptyList());
+        Mockito.when(todoItemService.getAll(eq(principal), eq("list-id"))).thenReturn(Collections.emptyList());
 
-        Response response = target("/v1/lists").request()
+        Response response = target("/v1/lists/list-id/items").request()
                 .header(SecurityHeader.RAPID_API_PROXY_SECRET.getHeader(), "proxy-secret")
                 .header(SecurityHeader.RAPID_API_USER.getHeader(), "user")
                 .header(SecurityHeader.RAPID_API_SUBSCRIPTION.getHeader(), Subscription.BASIC.name())
@@ -89,22 +89,22 @@ public class GetAllTodoListsResourceIT extends BaseResourceIT {
 
         Assertions.assertEquals(200, response.getStatus());
         Assertions.assertEquals(MediaType.APPLICATION_JSON_TYPE, response.getMediaType());
-        List<TodoList> results = response.readEntity(new GenericType<>() {});
+        List<TodoItem> results = response.readEntity(new GenericType<>() {});
         Assertions.assertTrue(results.isEmpty());
         verifyCorsHeaders(response);
-        Mockito.verify(todoListService, Mockito.times(1)).getAll(eq(principal));
+        Mockito.verify(todoItemService, Mockito.times(1)).getAll(eq(principal), eq("list-id"));
     }
 
     @Test
-    public void testSomeTodoLists() {
-        List<TodoList> lists = Arrays.asList(
-                new TodoList().setId("1").setName("List 1"),
-                new TodoList().setId("2").setName("List 2")
+    public void testSomeTodoItems() {
+        List<TodoItem> items = Arrays.asList(
+                new TodoItem().setId("1").setTask("Task 1").setDone(false),
+                new TodoItem().setId("2").setTask("Task 2").setDone(true)
         );
         RapidApiPrincipal principal = new RapidApiPrincipal("proxy-secret", "user", Subscription.BASIC);
-        Mockito.when(todoListService.getAll(eq(principal))).thenReturn(lists);
+        Mockito.when(todoItemService.getAll(eq(principal), eq("list-id"))).thenReturn(items);
 
-        Response response = target("/v1/lists").request()
+        Response response = target("/v1/lists/list-id/items").request()
                 .header(SecurityHeader.RAPID_API_PROXY_SECRET.getHeader(), "proxy-secret")
                 .header(SecurityHeader.RAPID_API_USER.getHeader(), "user")
                 .header(SecurityHeader.RAPID_API_SUBSCRIPTION.getHeader(), Subscription.BASIC.name())
@@ -112,23 +112,23 @@ public class GetAllTodoListsResourceIT extends BaseResourceIT {
 
         Assertions.assertEquals(200, response.getStatus());
         Assertions.assertEquals(MediaType.APPLICATION_JSON_TYPE, response.getMediaType());
-        List<TodoList> results = response.readEntity(new GenericType<>() {});
-        Assertions.assertEquals(lists, results);
+        List<TodoItem> results = response.readEntity(new GenericType<>() {});
+        Assertions.assertEquals(items, results);
         verifyCorsHeaders(response);
-        Mockito.verify(todoListService, Mockito.times(1)).getAll(eq(principal));
+        Mockito.verify(todoItemService, Mockito.times(1)).getAll(eq(principal), eq("list-id"));
     }
 
     @Test
     public void testServiceException() {
         RapidApiPrincipal principal = new RapidApiPrincipal("proxy-secret", "user", Subscription.BASIC);
-        Mockito.when(todoListService.getAll(eq(principal))).thenThrow(new RuntimeException("Failed"));
+        Mockito.when(todoItemService.getAll(eq(principal), eq("list-id"))).thenThrow(new RuntimeException("Failed"));
 
-        Response response = target("/v1/lists").request()
+        Response response = target("/v1/lists/list-id/items").request()
                 .header(SecurityHeader.RAPID_API_PROXY_SECRET.getHeader(), "proxy-secret")
                 .header(SecurityHeader.RAPID_API_USER.getHeader(), "user")
                 .header(SecurityHeader.RAPID_API_SUBSCRIPTION.getHeader(), Subscription.BASIC.name())
                 .get();
         verifyErrorResponse(response, Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), "Failed");
-        Mockito.verify(todoListService, Mockito.times(1)).getAll(eq(principal));
+        Mockito.verify(todoItemService, Mockito.times(1)).getAll(eq(principal), eq("list-id"));
     }
 }

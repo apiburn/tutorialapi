@@ -30,6 +30,6 @@ public class PutTodoListResource {
         if (serviceFactory.getTodoListService().update(principal, todoList)) {
             return todoList;
         }
-        throw new NotFoundException("Todo list with id " + listId + " not found");
+        throw new NotFoundException("List with id " + listId + " not found");
     }
 }
