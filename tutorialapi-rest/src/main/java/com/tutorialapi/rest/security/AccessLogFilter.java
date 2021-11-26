@@ -1,6 +1,7 @@
 package com.tutorialapi.rest.security;
 
 import com.tutorialapi.model.user.RapidApiPrincipal;
+import jakarta.annotation.Priority;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerRequestFilter;
 import jakarta.ws.rs.ext.Provider;
@@ -11,6 +12,7 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 @Provider
+@Priority(2)
 public class AccessLogFilter implements ContainerRequestFilter {
     private static final Logger LOGGER = LoggerFactory.getLogger("access-log");
 

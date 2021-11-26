@@ -182,14 +182,16 @@ public class SqliteTodoListServiceIT {
 
     @Test
     public void testDeleteMissing() {
-        Assertions.assertFalse(todoListService.delete(principal1, "missing"));
+        Optional<TodoList> deleted = todoListService.delete(principal1, "missing");
+        Assertions.assertFalse(deleted.isPresent());
     }
 
     @Test
     public void testDeleteWrongUser() {
         TodoList list = new TodoList().setId("id").setName("name");
         Assertions.assertTrue(todoListService.create(principal1, list));
-        Assertions.assertFalse(todoListService.delete(principal2, list.getId()));
+        Optional<TodoList> deleted = todoListService.delete(principal2, list.getId());
+        Assertions.assertFalse(deleted.isPresent());
 
         Optional<TodoList> fetched = todoListService.get(principal1, list.getId());
         Assertions.assertTrue(fetched.isPresent());
@@ -199,7 +201,8 @@ public class SqliteTodoListServiceIT {
     public void testDeleteSuccess() {
         TodoList list = new TodoList().setId("id").setName("name");
         Assertions.assertTrue(todoListService.create(principal1, list));
-        Assertions.assertTrue(todoListService.delete(principal1, list.getId()));
+        Optional<TodoList> deleted = todoListService.delete(principal1, list.getId());
+        Assertions.assertTrue(deleted.isPresent());
 
         Optional<TodoList> fetched = todoListService.get(principal1, list.getId());
         Assertions.assertTrue(fetched.isEmpty());

@@ -1,4 +1,4 @@
-package com.tutorialapi.rest.resource;
+package com.tutorialapi.rest.resource.v1.lists;
 
 import com.tutorialapi.model.config.ConfigKey;
 import com.tutorialapi.model.user.Subscription;
@@ -18,7 +18,7 @@ import org.sqlite.JDBC;
 import java.util.Properties;
 import java.util.logging.LogManager;
 
-public class HelloResourceIT extends JerseyTest {
+public class GetAllTodoListsResourceIT extends JerseyTest {
     static {
         LogManager.getLogManager().reset();
     }
@@ -37,7 +37,7 @@ public class HelloResourceIT extends JerseyTest {
 
     @Test
     public void testNoSecurityHeaders() {
-        Response response = target("/test").request().get();
+        Response response = target("/v1/lists").request().get();
 
         Assertions.assertEquals(401, response.getStatus());
         Assertions.assertEquals(MediaType.APPLICATION_JSON_TYPE, response.getMediaType());
@@ -49,7 +49,7 @@ public class HelloResourceIT extends JerseyTest {
 
     @Test
     public void testOnlyProxySecretHeader() {
-        Response response = target("/test").request()
+        Response response = target("/v1/lists").request()
                 .header(SecurityHeader.RAPID_API_PROXY_SECRET.getHeader(), "proxy-secret")
                 .get();
 
@@ -63,7 +63,7 @@ public class HelloResourceIT extends JerseyTest {
 
     @Test
     public void testProxySecretAndUserHeader() {
-        Response response = target("/test").request()
+        Response response = target("/v1/lists").request()
                 .header(SecurityHeader.RAPID_API_PROXY_SECRET.getHeader(), "proxy-secret")
                 .header(SecurityHeader.RAPID_API_USER.getHeader(), "user")
                 .get();
@@ -79,7 +79,7 @@ public class HelloResourceIT extends JerseyTest {
 
     @Test
     public void testInvalidSubscription() {
-        Response response = target("/test").request()
+        Response response = target("/v1/lists").request()
                 .header(SecurityHeader.RAPID_API_PROXY_SECRET.getHeader(), "proxy-secret")
                 .header(SecurityHeader.RAPID_API_USER.getHeader(), "user")
                 .header(SecurityHeader.RAPID_API_SUBSCRIPTION.getHeader(), "invalid")
@@ -96,15 +96,17 @@ public class HelloResourceIT extends JerseyTest {
 
     @Test
     public void testValidHeaders() {
-        Response response = target("/test").request()
+        Response response = target("/v1/lists").request()
                 .header(SecurityHeader.RAPID_API_PROXY_SECRET.getHeader(), "proxy-secret")
                 .header(SecurityHeader.RAPID_API_USER.getHeader(), "user")
                 .header(SecurityHeader.RAPID_API_SUBSCRIPTION.getHeader(), Subscription.BASIC.name())
                 .get();
 
         Assertions.assertEquals(200, response.getStatus());
-        Assertions.assertEquals(MediaType.TEXT_PLAIN_TYPE, response.getMediaType());
-        Assertions.assertEquals("Hello", response.readEntity(String.class));
+        Assertions.assertEquals(MediaType.APPLICATION_JSON_TYPE, response.getMediaType());
+
+        // TODO
+        response.readEntity(String.class);
 
         Assertions.assertEquals("*", response.getHeaderString("Access-Control-Allow-Origin"));
         Assertions.assertEquals("DELETE, HEAD, GET, OPTIONS, PATCH, POST, PUT",

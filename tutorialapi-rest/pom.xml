@@ -53,6 +53,12 @@
             <artifactId>HikariCP</artifactId>
         </dependency>
 
+        <!-- Used for JAX-RS annotations -->
+        <dependency>
+            <groupId>jakarta.annotation</groupId>
+            <artifactId>jakarta.annotation-api</artifactId>
+        </dependency>
+
         <!-- Used for dependency injection annotations -->
         <dependency>
             <groupId>jakarta.inject</groupId>

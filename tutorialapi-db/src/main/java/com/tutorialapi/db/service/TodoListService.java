@@ -11,6 +11,6 @@ public interface TodoListService {
     List<TodoList> getAll(RapidApiPrincipal principal);
     boolean create(RapidApiPrincipal principal, TodoList todoList);
     boolean update(RapidApiPrincipal principal, TodoList todoList);
-    boolean delete(RapidApiPrincipal principal, String id);
+    Optional<TodoList> delete(RapidApiPrincipal principal, String id);
     int truncate();
 }
