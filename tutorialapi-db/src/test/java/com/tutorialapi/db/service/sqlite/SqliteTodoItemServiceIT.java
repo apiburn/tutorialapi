@@ -209,14 +209,16 @@ public class SqliteTodoItemServiceIT {
 
     @Test
     public void testDeleteMissing() {
-        Assertions.assertFalse(todoItemService.delete(principal1, list1.getId(), "missing"));
+        Optional<TodoItem> deleted = todoItemService.delete(principal1, list1.getId(), "missing");
+        Assertions.assertFalse(deleted.isPresent());
     }
 
     @Test
     public void testDeleteWrongUser() {
         TodoItem item = new TodoItem().setId("id").setTask("task").setDone(false);
         Assertions.assertTrue(todoItemService.create(principal1, list1.getId(), item));
-        Assertions.assertFalse(todoItemService.delete(principal2, list1.getId(), item.getId()));
+        Optional<TodoItem> deleted = todoItemService.delete(principal2, list1.getId(), item.getId());
+        Assertions.assertFalse(deleted.isPresent());
 
         Optional<TodoItem> fetched = todoItemService.get(principal1, list1.getId(), item.getId());
         Assertions.assertTrue(fetched.isPresent());
@@ -226,7 +228,8 @@ public class SqliteTodoItemServiceIT {
     public void testDeleteSuccess() {
         TodoItem item = new TodoItem().setId("id").setTask("task").setDone(false);
         Assertions.assertTrue(todoItemService.create(principal1, list1.getId(), item));
-        Assertions.assertTrue(todoItemService.delete(principal1, list1.getId(), item.getId()));
+        Optional<TodoItem> deleted = todoItemService.delete(principal1, list1.getId(), item.getId());
+        Assertions.assertTrue(deleted.isPresent());
 
         Optional<TodoItem> fetched = todoItemService.get(principal1, list1.getId(), item.getId());
         Assertions.assertTrue(fetched.isEmpty());

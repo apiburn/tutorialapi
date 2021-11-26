@@ -9,7 +9,7 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.SecurityContext;
 
-@Path("/v1/lists/{id}")
+@Path("/v1/lists/{listId}")
 public class DeleteTodoListResource {
     private final ServiceFactory serviceFactory;
 
@@ -20,7 +20,7 @@ public class DeleteTodoListResource {
 
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
-    public TodoList postTodoList(@Context SecurityContext securityContext, @PathParam("id") String listId) {
+    public TodoList deleteTodoList(@Context SecurityContext securityContext, @PathParam("listId") String listId) {
         RapidApiPrincipal principal = (RapidApiPrincipal) securityContext.getUserPrincipal();
         return serviceFactory.getTodoListService().delete(principal, listId)
                 .orElseThrow(() -> new NotFoundException("Todo list with id " + listId + " not found"));

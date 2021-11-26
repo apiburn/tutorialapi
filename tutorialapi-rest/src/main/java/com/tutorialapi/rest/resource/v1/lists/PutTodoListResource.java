@@ -9,7 +9,7 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.SecurityContext;
 
-@Path("/v1/lists/{id}")
+@Path("/v1/lists/{listId}")
 public class PutTodoListResource {
     private final ServiceFactory serviceFactory;
 
@@ -21,9 +21,9 @@ public class PutTodoListResource {
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public TodoList postTodoList(@Context SecurityContext securityContext,
-                                 @PathParam("id") String listId,
-                                 TodoList todoList) {
+    public TodoList putTodoList(@Context SecurityContext securityContext,
+                                @PathParam("listId") String listId,
+                                TodoList todoList) {
         todoList.setId(listId);
 
         RapidApiPrincipal principal = (RapidApiPrincipal) securityContext.getUserPrincipal();

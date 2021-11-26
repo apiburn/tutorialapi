@@ -11,6 +11,6 @@ public interface TodoItemService {
     List<TodoItem> getAll(RapidApiPrincipal principal, String listId);
     boolean create(RapidApiPrincipal principal, String listId, TodoItem todoItem);
     boolean update(RapidApiPrincipal principal, String listId, TodoItem todoItem);
-    boolean delete(RapidApiPrincipal principal, String listId, String id);
+    Optional<TodoItem> delete(RapidApiPrincipal principal, String listId, String id);
     int truncate();
 }

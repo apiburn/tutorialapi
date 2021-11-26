@@ -120,22 +120,24 @@ public class SqliteTodoItemService implements TodoItemService {
     }
 
     @Override
-    public boolean delete(RapidApiPrincipal principal, String listId, String id) {
-        String sql = "DELETE FROM todo_items WHERE user_id = ? AND list_id = ? AND id = ?";
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            int index = 0;
-            ps.setString(++index, principal.getUser());
-            ps.setString(++index, listId);
-            ps.setString(++index, id);
-            if (ps.executeUpdate() > 0) {
-                conn.commit();
-                return true;
+    public Optional<TodoItem> delete(RapidApiPrincipal principal, String listId, String id) {
+        Optional<TodoItem> fetched = get(principal, listId, id);
+        if (fetched.isPresent()) {
+            String sql = "DELETE FROM todo_items WHERE user_id = ? AND list_id = ? AND id = ?";
+            try (Connection conn = dataSource.getConnection();
+                 PreparedStatement ps = conn.prepareStatement(sql)) {
+                int index = 0;
+                ps.setString(++index, principal.getUser());
+                ps.setString(++index, listId);
+                ps.setString(++index, id);
+                if (ps.executeUpdate() > 0) {
+                    conn.commit();
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException("Failed to delete item: " + e.getMessage(), e);
             }
-            return false;
-        } catch (SQLException e) {
-            throw new RuntimeException("Failed to delete item: " + e.getMessage(), e);
         }
+        return fetched;
     }
 
     @Override
