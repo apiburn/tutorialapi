@@ -13,18 +13,21 @@ import javax.sql.DataSource;
 
 public class ApiApplication extends ResourceConfig {
     public ApiApplication(Config config) {
+        this(createServiceFactory(config));
+    }
+
+    public ApiApplication(ServiceFactory serviceFactory) {
         packages(ApiApplication.class.getPackageName());
 
         register(new AbstractBinder() {
             @Override
             protected void configure() {
-                ServiceFactory serviceFactory = createServiceFactory(config);
                 bind(serviceFactory).to(ServiceFactory.class);
             }
         });
     }
 
-    private ServiceFactory createServiceFactory(Config config) {
+    private static ServiceFactory createServiceFactory(Config config) {
         HikariConfig dbConfig = new HikariConfig();
         dbConfig.setDriverClassName(config.getString(ConfigKey.DB_DRIVER.getKey()));
         dbConfig.setJdbcUrl(config.getString(ConfigKey.DB_URL.getKey()));
