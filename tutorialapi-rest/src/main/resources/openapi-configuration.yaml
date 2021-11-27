@@ -1,0 +1,15 @@
+resourcePackages:
+  - com.tutorialapi.rest
+prettyPrint: true
+cacheTTL: 0
+sortOutput: true
+openAPI:
+  info:
+    version: '${project.version}'
+    title: 'TutorialAPI Example'
+    description: 'This is a sample TutorialAPI server.'
+    contact:
+      email: support@tutorialapi.com
+    license:
+      name: Apache 2.0
+      url: http://www.apache.org/licenses/LICENSE-2.0.html

@@ -6,11 +6,15 @@ import com.tutorialapi.model.config.ConfigKey;
 import com.typesafe.config.Config;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import io.swagger.v3.jaxrs2.integration.resources.AcceptHeaderOpenApiResource;
+import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
+import jakarta.ws.rs.ApplicationPath;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.server.ResourceConfig;
 
 import javax.sql.DataSource;
 
+@ApplicationPath("/api") // Only used by OpenAPI docs
 public class ApiApplication extends ResourceConfig {
     public ApiApplication(Config config) {
         this(createServiceFactory(config));
@@ -18,6 +22,9 @@ public class ApiApplication extends ResourceConfig {
 
     public ApiApplication(ServiceFactory serviceFactory) {
         packages(ApiApplication.class.getPackageName());
+
+        register(OpenApiResource.class);
+        register(AcceptHeaderOpenApiResource.class);
 
         register(new AbstractBinder() {
             @Override

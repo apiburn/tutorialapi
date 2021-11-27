@@ -183,7 +183,7 @@ public class PostTodoListResourceIT extends BaseResourceIT {
                 .header(SecurityHeader.RAPID_API_SUBSCRIPTION.getHeader(), Subscription.BASIC.name())
                 .post(entity);
         verifyErrorResponse(response, Response.Status.BAD_REQUEST.getStatusCode(),
-                "Todo list id max length is 36 characters");
+                "Todo list id must have at least 1 and no more than 36 characters");
         Mockito.verify(todoListService, Mockito.times(0)).create(any(), any());
     }
 
@@ -230,7 +230,8 @@ public class PostTodoListResourceIT extends BaseResourceIT {
                 .header(SecurityHeader.RAPID_API_SUBSCRIPTION.getHeader(), Subscription.BASIC.name())
                 .post(entity);
         verifyErrorResponse(response, Response.Status.BAD_REQUEST.getStatusCode(),
-                "Todo list id cannot be empty; Todo list name cannot be empty");
+                "Todo list id cannot be empty; Todo list id must have at least 1 and no more than 36 characters; " +
+                "Todo list name cannot be empty; Todo list name must have at least 1 and no more than 200 characters");
         Mockito.verify(todoListService, Mockito.times(0)).create(any(), any());
     }
 }

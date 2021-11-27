@@ -32,6 +32,10 @@ public class SecurityFilter implements ContainerRequestFilter {
 
     @Override
     public void filter(ContainerRequestContext containerRequestContext) {
+        if (containerRequestContext.getUriInfo().getRequestUri().getPath().startsWith("/api/openapi")) {
+            return;
+        }
+
         Optional<String> proxySecret = getHeader(containerRequestContext, SecurityHeader.RAPID_API_PROXY_SECRET.getHeader());
         Optional<String> user = getHeader(containerRequestContext, SecurityHeader.RAPID_API_USER.getHeader());
         Optional<Subscription> subscription = getHeader(containerRequestContext,

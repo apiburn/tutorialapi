@@ -164,7 +164,7 @@ public class PutTodoListResourceIT extends BaseResourceIT {
                 .header(SecurityHeader.RAPID_API_SUBSCRIPTION.getHeader(), Subscription.BASIC.name())
                 .put(entity);
         verifyErrorResponse(response, Response.Status.BAD_REQUEST.getStatusCode(),
-                "Todo list name max length is 200 characters");
+                "Todo list name must have at least 1 and no more than 200 characters");
         Mockito.verify(todoListService, Mockito.times(0)).update(any(), any());
     }
 
@@ -211,7 +211,8 @@ public class PutTodoListResourceIT extends BaseResourceIT {
                 .header(SecurityHeader.RAPID_API_USER.getHeader(), "user")
                 .header(SecurityHeader.RAPID_API_SUBSCRIPTION.getHeader(), Subscription.BASIC.name())
                 .put(entity);
-        verifyErrorResponse(response, Response.Status.BAD_REQUEST.getStatusCode(), "Todo list name cannot be empty");
+        verifyErrorResponse(response, Response.Status.BAD_REQUEST.getStatusCode(),
+                "Todo list name cannot be empty; Todo list name must have at least 1 and no more than 200 characters");
         Mockito.verify(todoListService, Mockito.times(0)).update(any(), any());
     }
 }

@@ -6,14 +6,21 @@ import jakarta.ws.rs.NotAuthorizedException;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.MultivaluedHashMap;
 import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.UriInfo;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 
+import java.net.URI;
+
 public class SecurityFilterTest {
     private String testNotAuthorized(MultivaluedMap<String, String> headers) {
+        UriInfo uriInfo = Mockito.mock(UriInfo.class);
+        Mockito.when(uriInfo.getRequestUri()).thenReturn(URI.create("https://tutorialapi.com/api/lists"));
+
         ContainerRequestContext containerRequestContext = Mockito.mock(ContainerRequestContext.class);
+        Mockito.when(containerRequestContext.getUriInfo()).thenReturn(uriInfo);
         Mockito.when(containerRequestContext.getHeaders()).thenReturn(headers);
 
         NotAuthorizedException notAuthorized = Assertions.assertThrows(NotAuthorizedException.class,
@@ -59,12 +66,16 @@ public class SecurityFilterTest {
     public void testFilterWithAllHeaders() {
         RapidApiPrincipal principal = new RapidApiPrincipal("proxy-secret", "user", Subscription.BASIC);
 
+        UriInfo uriInfo = Mockito.mock(UriInfo.class);
+        Mockito.when(uriInfo.getRequestUri()).thenReturn(URI.create("https://tutorialapi.com/api/lists"));
+
         MultivaluedMap<String, String> headers = new MultivaluedHashMap<>();
         headers.putSingle(SecurityHeader.RAPID_API_PROXY_SECRET.getHeader(), principal.getProxySecret());
         headers.putSingle(SecurityHeader.RAPID_API_USER.getHeader(), principal.getUser());
         headers.putSingle(SecurityHeader.RAPID_API_SUBSCRIPTION.getHeader(), principal.getSubscription().name());
 
         ContainerRequestContext containerRequestContext = Mockito.mock(ContainerRequestContext.class);
+        Mockito.when(containerRequestContext.getUriInfo()).thenReturn(uriInfo);
         Mockito.when(containerRequestContext.getHeaders()).thenReturn(headers);
 
         new SecurityFilter().filter(containerRequestContext);
