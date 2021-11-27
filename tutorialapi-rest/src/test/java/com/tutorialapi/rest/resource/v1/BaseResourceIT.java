@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Assertions;
 
 import java.util.logging.LogManager;
 
-public class BaseResourceIT extends JerseyTest {
+public abstract class BaseResourceIT extends JerseyTest {
     static {
         LogManager.getLogManager().reset();
     }

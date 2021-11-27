@@ -1,9 +1,17 @@
 package com.tutorialapi.model;
 
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
+
 import java.util.Objects;
 
 public class TodoList {
+    @NotEmpty(message = "Todo list id cannot be empty")
+    @Size(max = 36, message = "Todo list id max length is 36 characters")
     private String id;
+
+    @NotEmpty(message = "Todo list name cannot be empty")
+    @Size(max = 200, message = "Todo list name max length is 200 characters")
     private String name;
 
     public String getId() {

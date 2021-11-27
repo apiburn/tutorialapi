@@ -87,7 +87,7 @@ public class GetAllTodoListsResourceIT extends BaseResourceIT {
                 .header(SecurityHeader.RAPID_API_SUBSCRIPTION.getHeader(), Subscription.BASIC.name())
                 .get();
 
-        Assertions.assertEquals(200, response.getStatus());
+        Assertions.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
         Assertions.assertEquals(MediaType.APPLICATION_JSON_TYPE, response.getMediaType());
         List<TodoList> results = response.readEntity(new GenericType<>() {});
         Assertions.assertTrue(results.isEmpty());
@@ -110,7 +110,7 @@ public class GetAllTodoListsResourceIT extends BaseResourceIT {
                 .header(SecurityHeader.RAPID_API_SUBSCRIPTION.getHeader(), Subscription.BASIC.name())
                 .get();
 
-        Assertions.assertEquals(200, response.getStatus());
+        Assertions.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
         Assertions.assertEquals(MediaType.APPLICATION_JSON_TYPE, response.getMediaType());
         List<TodoList> results = response.readEntity(new GenericType<>() {});
         Assertions.assertEquals(lists, results);

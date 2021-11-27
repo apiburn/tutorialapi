@@ -111,7 +111,7 @@ public class PostTodoListResourceIT extends BaseResourceIT {
                 .header(SecurityHeader.RAPID_API_SUBSCRIPTION.getHeader(), Subscription.BASIC.name())
                 .post(entity);
 
-        Assertions.assertEquals(200, response.getStatus());
+        Assertions.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
         Assertions.assertEquals(MediaType.APPLICATION_JSON_TYPE, response.getMediaType());
         Assertions.assertEquals(todoList, response.readEntity(TodoList.class));
         verifyCorsHeaders(response);
@@ -131,7 +131,7 @@ public class PostTodoListResourceIT extends BaseResourceIT {
                 .header(SecurityHeader.RAPID_API_SUBSCRIPTION.getHeader(), Subscription.BASIC.name())
                 .post(entity);
 
-        Assertions.assertEquals(200, response.getStatus());
+        Assertions.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
         Assertions.assertEquals(MediaType.APPLICATION_JSON_TYPE, response.getMediaType());
         TodoList result = response.readEntity(TodoList.class);
         Assertions.assertNotNull(result.getId());
@@ -171,5 +171,66 @@ public class PostTodoListResourceIT extends BaseResourceIT {
                 .post(entity);
         verifyErrorResponse(response, Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), "Failed");
         Mockito.verify(todoListService, Mockito.times(1)).create(eq(principal), eq(todoList));
+    }
+
+    @Test
+    public void testValidationError() {
+        TodoList todoList = new TodoList().setId("aaaaaaaaaabbbbbbbbbbccccccccccdddddddddd").setName("List Name");
+        Entity<TodoList> entity = Entity.entity(todoList, MediaType.APPLICATION_JSON_TYPE);
+        Response response = target("/v1/lists").request()
+                .header(SecurityHeader.RAPID_API_PROXY_SECRET.getHeader(), "proxy-secret")
+                .header(SecurityHeader.RAPID_API_USER.getHeader(), "user")
+                .header(SecurityHeader.RAPID_API_SUBSCRIPTION.getHeader(), Subscription.BASIC.name())
+                .post(entity);
+        verifyErrorResponse(response, Response.Status.BAD_REQUEST.getStatusCode(),
+                "Todo list id max length is 36 characters");
+        Mockito.verify(todoListService, Mockito.times(0)).create(any(), any());
+    }
+
+    @Test
+    public void testHtml() {
+        RapidApiPrincipal principal = new RapidApiPrincipal("proxy-secret", "user", Subscription.BASIC);
+        Mockito.when(todoListService.create(eq(principal), any())).thenReturn(true);
+
+        TodoList todoList = new TodoList().setId("list-id").setName("<h1>Hello & Goodbye</h1>");
+        Entity<TodoList> entity = Entity.entity(todoList, MediaType.APPLICATION_JSON_TYPE);
+        Response response = target("/v1/lists").request()
+                .header(SecurityHeader.RAPID_API_PROXY_SECRET.getHeader(), "proxy-secret")
+                .header(SecurityHeader.RAPID_API_USER.getHeader(), "user")
+                .header(SecurityHeader.RAPID_API_SUBSCRIPTION.getHeader(), Subscription.BASIC.name())
+                .post(entity);
+        Assertions.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+        Assertions.assertEquals(MediaType.APPLICATION_JSON_TYPE, response.getMediaType());
+        TodoList result = response.readEntity(TodoList.class);
+        Assertions.assertEquals("&lt;h1&gt;Hello &amp; Goodbye&lt;/h1&gt;", result.getName());
+        verifyCorsHeaders(response);
+        Mockito.verify(todoListService, Mockito.times(1)).create(eq(principal), any());
+    }
+
+    @Test
+    public void testNullValues() {
+        TodoList todoList = new TodoList().setId(null).setName(null);
+        Entity<TodoList> entity = Entity.entity(todoList, MediaType.APPLICATION_JSON_TYPE);
+        Response response = target("/v1/lists").request()
+                .header(SecurityHeader.RAPID_API_PROXY_SECRET.getHeader(), "proxy-secret")
+                .header(SecurityHeader.RAPID_API_USER.getHeader(), "user")
+                .header(SecurityHeader.RAPID_API_SUBSCRIPTION.getHeader(), Subscription.BASIC.name())
+                .post(entity);
+        verifyErrorResponse(response, Response.Status.BAD_REQUEST.getStatusCode(), "Todo list name cannot be empty");
+        Mockito.verify(todoListService, Mockito.times(0)).create(any(), any());
+    }
+
+    @Test
+    public void testEmptyValues() {
+        TodoList todoList = new TodoList().setId("").setName("");
+        Entity<TodoList> entity = Entity.entity(todoList, MediaType.APPLICATION_JSON_TYPE);
+        Response response = target("/v1/lists").request()
+                .header(SecurityHeader.RAPID_API_PROXY_SECRET.getHeader(), "proxy-secret")
+                .header(SecurityHeader.RAPID_API_USER.getHeader(), "user")
+                .header(SecurityHeader.RAPID_API_SUBSCRIPTION.getHeader(), Subscription.BASIC.name())
+                .post(entity);
+        verifyErrorResponse(response, Response.Status.BAD_REQUEST.getStatusCode(),
+                "Todo list id cannot be empty; Todo list name cannot be empty");
+        Mockito.verify(todoListService, Mockito.times(0)).create(any(), any());
     }
 }

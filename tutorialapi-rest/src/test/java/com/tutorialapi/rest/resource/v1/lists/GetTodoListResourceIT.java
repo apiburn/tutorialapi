@@ -99,7 +99,7 @@ public class GetTodoListResourceIT extends BaseResourceIT {
                 .header(SecurityHeader.RAPID_API_SUBSCRIPTION.getHeader(), Subscription.BASIC.name())
                 .get();
 
-        Assertions.assertEquals(200, response.getStatus());
+        Assertions.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
         Assertions.assertEquals(MediaType.APPLICATION_JSON_TYPE, response.getMediaType());
         Assertions.assertEquals(todoList, response.readEntity(TodoList.class));
         verifyCorsHeaders(response);

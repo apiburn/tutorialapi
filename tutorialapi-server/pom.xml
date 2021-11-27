@@ -48,6 +48,11 @@
                     <groupId>jakarta.annotation</groupId>
                     <artifactId>jakarta.annotation-api</artifactId>
                 </exclusion>
+                <!-- Use newer version brought in from tutorialapi-rest -->
+                <exclusion>
+                    <groupId>jakarta.el</groupId>
+                    <artifactId>jakarta.el-api</artifactId>
+                </exclusion>
                 <!-- Using newer version from jersey-container-servlet-core -->
                 <exclusion>
                     <groupId>jakarta.inject</groupId>

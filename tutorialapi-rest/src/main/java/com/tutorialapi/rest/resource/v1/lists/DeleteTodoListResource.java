@@ -3,6 +3,7 @@ package com.tutorialapi.rest.resource.v1.lists;
 import com.tutorialapi.db.ServiceFactory;
 import com.tutorialapi.model.TodoList;
 import com.tutorialapi.model.user.RapidApiPrincipal;
+import com.tutorialapi.rest.resource.v1.BaseResource;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
@@ -10,7 +11,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.SecurityContext;
 
 @Path("/v1/lists/{listId}")
-public class DeleteTodoListResource {
+public class DeleteTodoListResource extends BaseResource {
     private final ServiceFactory serviceFactory;
 
     @Inject

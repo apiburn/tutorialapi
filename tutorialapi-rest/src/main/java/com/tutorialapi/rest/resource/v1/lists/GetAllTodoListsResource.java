@@ -3,6 +3,7 @@ package com.tutorialapi.rest.resource.v1.lists;
 import com.tutorialapi.db.ServiceFactory;
 import com.tutorialapi.model.TodoList;
 import com.tutorialapi.model.user.RapidApiPrincipal;
+import com.tutorialapi.rest.resource.v1.BaseResource;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -14,7 +15,7 @@ import jakarta.ws.rs.core.SecurityContext;
 import java.util.List;
 
 @Path("/v1/lists")
-public class GetAllTodoListsResource {
+public class GetAllTodoListsResource extends BaseResource {
     private final ServiceFactory serviceFactory;
 
     @Inject
