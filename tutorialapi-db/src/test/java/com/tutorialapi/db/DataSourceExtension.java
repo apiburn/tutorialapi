@@ -25,6 +25,7 @@ public class DataSourceExtension implements BeforeEachCallback, ParameterResolve
 
     @Override
     public void beforeEach(ExtensionContext context) {
+        serviceFactory.getApiKeyService().truncate();
         serviceFactory.getTodoListService().truncate();
         serviceFactory.getTodoItemService().truncate();
     }

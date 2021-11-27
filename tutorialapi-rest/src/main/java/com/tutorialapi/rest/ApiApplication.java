@@ -17,10 +17,10 @@ import javax.sql.DataSource;
 @ApplicationPath("/api") // Only used by OpenAPI docs
 public class ApiApplication extends ResourceConfig {
     public ApiApplication(Config config) {
-        this(createServiceFactory(config));
+        this(config, createServiceFactory(config));
     }
 
-    public ApiApplication(ServiceFactory serviceFactory) {
+    public ApiApplication(Config config, ServiceFactory serviceFactory) {
         packages(ApiApplication.class.getPackageName());
 
         register(OpenApiResource.class);
@@ -29,6 +29,7 @@ public class ApiApplication extends ResourceConfig {
         register(new AbstractBinder() {
             @Override
             protected void configure() {
+                bind(config).to(Config.class);
                 bind(serviceFactory).to(ServiceFactory.class);
             }
         });

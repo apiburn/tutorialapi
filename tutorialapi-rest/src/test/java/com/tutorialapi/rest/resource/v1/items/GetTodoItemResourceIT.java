@@ -3,11 +3,14 @@ package com.tutorialapi.rest.resource.v1.items;
 import com.tutorialapi.db.ServiceFactory;
 import com.tutorialapi.db.service.TodoItemService;
 import com.tutorialapi.model.TodoItem;
+import com.tutorialapi.model.config.ConfigKey;
 import com.tutorialapi.model.user.RapidApiPrincipal;
 import com.tutorialapi.model.user.Subscription;
 import com.tutorialapi.rest.ApiApplication;
 import com.tutorialapi.rest.resource.v1.BaseResourceIT;
 import com.tutorialapi.rest.security.SecurityHeader;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import jakarta.ws.rs.core.Application;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -16,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.util.Optional;
+import java.util.Properties;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -29,7 +33,11 @@ public class GetTodoItemResourceIT extends BaseResourceIT {
         todoItemService = Mockito.mock(TodoItemService.class);
         Mockito.when(serviceFactory.getTodoItemService()).thenReturn(todoItemService);
 
-        return new ApiApplication(serviceFactory);
+        Properties configProperties = new Properties();
+        configProperties.setProperty(ConfigKey.RAPIDAPI_PROXY_SECRET.getKey(), "proxy-secret");
+        Config config = ConfigFactory.parseProperties(configProperties);
+
+        return new ApiApplication(config, serviceFactory);
     }
 
     @Test

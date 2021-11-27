@@ -10,4 +10,6 @@ public enum ConfigKey implements Key {
     DB_URL,
     DB_USERNAME,
     DB_PASSWORD,
+
+    RAPIDAPI_PROXY_SECRET,
 }
