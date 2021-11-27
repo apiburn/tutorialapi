@@ -3,6 +3,7 @@ package com.tutorialapi.server;
 import com.tutorialapi.rest.ApiApplication;
 import com.tutorialapi.model.config.ConfigKey;
 import com.tutorialapi.model.config.SystemKey;
+import com.tutorialapi.server.task.MemoryLoggingTask;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.eclipse.jetty.http.HttpScheme;
@@ -20,6 +21,9 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Optional;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class TutorialApiServer {
     private static final Logger LOGGER = LoggerFactory.getLogger(TutorialApiServer.class);
@@ -75,6 +79,9 @@ public class TutorialApiServer {
 
         String url = String.format("https://raw.githubusercontent.com/apiburn/tutorialapi/main/system-%s.properties", mode);
         Config config = ConfigFactory.parseURL(new URL(url));
+
+        ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+        scheduledExecutorService.scheduleAtFixedRate(new MemoryLoggingTask(), 2, 2, TimeUnit.MINUTES);
 
         Server server = createJettyServer(port, config);
 
