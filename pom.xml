@@ -16,6 +16,7 @@
         <module>tutorialapi-model</module>
         <module>tutorialapi-rest</module>
         <module>tutorialapi-server</module>
+        <module>tutorialapi-zip</module>
     </modules>
 
     <dependencyManagement>
@@ -33,6 +34,11 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>tutorialapi-rest</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>tutorialapi-server</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -198,6 +204,29 @@
     <build>
         <pluginManagement>
             <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-assembly-plugin</artifactId>
+                    <version>3.3.0</version>
+                    <configuration>
+                        <appendAssemblyId>false</appendAssemblyId>
+                        <descriptors>
+                            <descriptor>src/main/assembly/assembly.xml</descriptor>
+                        </descriptors>
+                        <formats>
+                            <format>zip</format>
+                        </formats>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>assembly</id>
+                            <goals>
+                                <goal>single</goal>
+                            </goals>
+                            <phase>package</phase>
+                        </execution>
+                    </executions>
+                </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-clean-plugin</artifactId>
