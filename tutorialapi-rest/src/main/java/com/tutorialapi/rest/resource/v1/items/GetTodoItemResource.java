@@ -1,8 +1,8 @@
 package com.tutorialapi.rest.resource.v1.items;
 
-import com.tutorialapi.db.ServiceFactory;
 import com.tutorialapi.model.TodoItem;
 import com.tutorialapi.model.user.RapidApiPrincipal;
+import com.tutorialapi.rest.Environment;
 import com.tutorialapi.rest.exception.ErrorResponse;
 import com.tutorialapi.rest.resource.v1.BaseResource;
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,13 +18,15 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.SecurityContext;
 
+import java.util.function.Supplier;
+
 @Path("/v1/lists/{listId}/items/{id}")
 public class GetTodoItemResource extends BaseResource {
-    private final ServiceFactory serviceFactory;
+    private final Supplier<Environment> environmentSupplier;
 
     @Inject
-    public GetTodoItemResource(ServiceFactory serviceFactory) {
-        this.serviceFactory = serviceFactory;
+    public GetTodoItemResource(Supplier<Environment> environmentSupplier) {
+        this.environmentSupplier = environmentSupplier;
     }
 
     @GET
@@ -154,7 +156,7 @@ public class GetTodoItemResource extends BaseResource {
                                 )
                                 @PathParam("id") String id) {
         RapidApiPrincipal principal = (RapidApiPrincipal) securityContext.getUserPrincipal();
-        return serviceFactory.getTodoItemService().get(principal, listId, id).orElseThrow(() ->
-                new NotFoundException("Item with id " + id + " not found in list with id " + listId));
+        return environmentSupplier.get().getServiceFactory().getTodoItemService().get(principal, listId, id)
+                .orElseThrow(() -> new NotFoundException("Item with id " + id + " not found in list with id " + listId));
     }
 }

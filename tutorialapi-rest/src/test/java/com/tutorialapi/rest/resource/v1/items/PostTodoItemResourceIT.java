@@ -11,6 +11,7 @@ import com.tutorialapi.model.config.ConfigKey;
 import com.tutorialapi.model.user.RapidApiPrincipal;
 import com.tutorialapi.model.user.Subscription;
 import com.tutorialapi.rest.ApiApplication;
+import com.tutorialapi.rest.Environment;
 import com.tutorialapi.rest.resource.v1.BaseResourceIT;
 import com.tutorialapi.rest.security.SecurityHeader;
 import com.typesafe.config.Config;
@@ -45,7 +46,7 @@ public class PostTodoItemResourceIT extends BaseResourceIT {
         configProperties.setProperty(ConfigKey.RAPIDAPI_PROXY_SECRET.getKey(), "proxy-secret");
         Config config = ConfigFactory.parseProperties(configProperties);
 
-        return new ApiApplication(config, serviceFactory);
+        return new ApiApplication(() -> new Environment(config, serviceFactory));
     }
 
     @Test

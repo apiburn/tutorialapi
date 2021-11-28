@@ -1,11 +1,11 @@
 package com.tutorialapi.server;
 
-import com.tutorialapi.rest.ApiApplication;
 import com.tutorialapi.model.config.ConfigKey;
 import com.tutorialapi.model.config.SystemKey;
+import com.tutorialapi.rest.ApiApplication;
+import com.tutorialapi.rest.Environment;
 import com.tutorialapi.server.task.MemoryLoggingTask;
 import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
 import org.eclipse.jetty.http.HttpScheme;
 import org.eclipse.jetty.http.HttpVersion;
 import org.eclipse.jetty.server.*;
@@ -19,11 +19,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 public class TutorialApiServer {
     private static final Logger LOGGER = LoggerFactory.getLogger(TutorialApiServer.class);
@@ -31,7 +31,7 @@ public class TutorialApiServer {
     private static final String ROOT_CONTEXT = "/";
     private static final String API_PATTERN = "/api/*";
 
-    private static Server createJettyServer(int port, Config config) throws IOException {
+    private static Server createJettyServer(int port, Supplier<Environment> environmentSupplier) throws IOException {
         HttpConfiguration httpsConfiguration = new HttpConfiguration();
         httpsConfiguration.setSecureScheme(HttpScheme.HTTPS.asString());
         httpsConfiguration.setSecurePort(port);
@@ -41,6 +41,7 @@ public class TutorialApiServer {
 
         HttpConnectionFactory httpsConnectionFactory = new HttpConnectionFactory(httpsConfiguration);
 
+        Config config = environmentSupplier.get().getConfig();
         SslContextFactory.Server sslContextFactory = new SslContextFactory.Server();
         sslContextFactory.setKeyStorePath(config.getString(ConfigKey.SERVER_KEYSTORE_FILE.getKey()));
         sslContextFactory.setKeyStoreType(config.getString(ConfigKey.SERVER_KEYSTORE_TYPE.getKey()));
@@ -65,7 +66,8 @@ public class TutorialApiServer {
 
         server.setHandler(servletContextHandler);
 
-        ServletHolder apiServletHolder = new ServletHolder(new ServletContainer(new ApiApplication(config)));
+        ApiApplication application = new ApiApplication(environmentSupplier);
+        ServletHolder apiServletHolder = new ServletHolder(new ServletContainer(application));
         servletContextHandler.addServlet(apiServletHolder, API_PATTERN);
 
         return server;
@@ -77,13 +79,12 @@ public class TutorialApiServer {
         String mode = Optional.ofNullable(System.getProperty(SystemKey.MODE.getKey()))
                 .orElse(SystemKey.MODE.getDefaultValue());
 
-        String url = String.format("https://raw.githubusercontent.com/apiburn/tutorialapi/main/system-%s.properties", mode);
-        Config config = ConfigFactory.parseURL(new URL(url));
-
         ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
         scheduledExecutorService.scheduleAtFixedRate(new MemoryLoggingTask(), 2, 2, TimeUnit.MINUTES);
 
-        Server server = createJettyServer(port, config);
+        Supplier<Environment> environmentSupplier = Environment.createEnvironment(scheduledExecutorService, mode);
+
+        Server server = createJettyServer(port, environmentSupplier);
 
         LOGGER.info("Server starting on port: {}", port);
         server.start();

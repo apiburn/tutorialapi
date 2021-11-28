@@ -6,6 +6,7 @@ import com.tutorialapi.model.config.ConfigKey;
 import com.tutorialapi.model.user.ApiKey;
 import com.tutorialapi.model.user.RapidApiPrincipal;
 import com.tutorialapi.model.user.Subscription;
+import com.tutorialapi.rest.Environment;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import jakarta.ws.rs.NotAuthorizedException;
@@ -41,8 +42,8 @@ public class SecurityFilterTest {
 
         ServiceFactory serviceFactory = Mockito.mock(ServiceFactory.class);
 
-        NotAuthorizedException notAuthorized = Assertions.assertThrows(NotAuthorizedException.class,
-                () -> new SecurityFilter(config, serviceFactory).filter(containerRequestContext));
+        NotAuthorizedException notAuthorized = Assertions.assertThrows(NotAuthorizedException.class, () ->
+                new SecurityFilter(() -> new Environment(config, serviceFactory)).filter(containerRequestContext));
 
         return notAuthorized.getMessage();
     }
@@ -102,8 +103,8 @@ public class SecurityFilterTest {
 
         ServiceFactory serviceFactory = Mockito.mock(ServiceFactory.class);
 
-        NotAuthorizedException notAuthorized = Assertions.assertThrows(NotAuthorizedException.class,
-                () -> new SecurityFilter(config, serviceFactory).filter(containerRequestContext));
+        NotAuthorizedException notAuthorized = Assertions.assertThrows(NotAuthorizedException.class, () ->
+                new SecurityFilter(() -> new Environment(config, serviceFactory)).filter(containerRequestContext));
 
         Assertions.assertEquals("Invalid proxy secret", notAuthorized.getMessage());
 
@@ -132,15 +133,13 @@ public class SecurityFilterTest {
 
         ServiceFactory serviceFactory = Mockito.mock(ServiceFactory.class);
 
-        new SecurityFilter(config, serviceFactory).filter(containerRequestContext);
+        new SecurityFilter(() -> new Environment(config, serviceFactory)).filter(containerRequestContext);
 
         RapidApiSecurityContext securityContext = new RapidApiSecurityContext(principal);
         Mockito.verify(containerRequestContext, Mockito.times(1)).setSecurityContext(ArgumentMatchers.eq(securityContext));
     }
 
     private void testApiKey(ApiKeyService apiKeyService, Consumer<ContainerRequestContext> consumer) {
-        RapidApiPrincipal principal = new RapidApiPrincipal("key", "user", Subscription.BASIC);
-
         UriInfo uriInfo = Mockito.mock(UriInfo.class);
         Mockito.when(uriInfo.getRequestUri()).thenReturn(URI.create("https://tutorialapi.com/api/lists"));
 
@@ -154,7 +153,7 @@ public class SecurityFilterTest {
         ServiceFactory serviceFactory = Mockito.mock(ServiceFactory.class);
         Mockito.when(serviceFactory.getApiKeyService()).thenReturn(apiKeyService);
 
-        new SecurityFilter(ConfigFactory.empty(), serviceFactory).filter(containerRequestContext);
+        new SecurityFilter(() -> new Environment(ConfigFactory.empty(), serviceFactory)).filter(containerRequestContext);
 
         consumer.accept(containerRequestContext);
     }
@@ -165,9 +164,8 @@ public class SecurityFilterTest {
         Mockito.when(apiKeyService.get(eq("key"))).thenReturn(Optional.empty());
 
         NotAuthorizedException notAuthorized = Assertions.assertThrows(NotAuthorizedException.class,
-                () -> testApiKey(apiKeyService, requestContext -> {
-                    Mockito.verify(requestContext, Mockito.times(0)).setSecurityContext(any());
-                }));
+                () -> testApiKey(apiKeyService, requestContext ->
+                        Mockito.verify(requestContext, Mockito.times(0)).setSecurityContext(any())));
 
         Assertions.assertEquals("Invalid API Key", notAuthorized.getMessage());
     }

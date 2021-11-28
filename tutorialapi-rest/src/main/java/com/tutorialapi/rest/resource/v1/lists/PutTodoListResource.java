@@ -1,8 +1,8 @@
 package com.tutorialapi.rest.resource.v1.lists;
 
-import com.tutorialapi.db.ServiceFactory;
 import com.tutorialapi.model.TodoList;
 import com.tutorialapi.model.user.RapidApiPrincipal;
+import com.tutorialapi.rest.Environment;
 import com.tutorialapi.rest.exception.ErrorResponse;
 import com.tutorialapi.rest.resource.v1.BaseResource;
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,14 +21,15 @@ import jakarta.ws.rs.core.SecurityContext;
 import org.apache.commons.text.StringEscapeUtils;
 
 import java.util.Optional;
+import java.util.function.Supplier;
 
 @Path("/v1/lists/{listId}")
 public class PutTodoListResource extends BaseResource {
-    private final ServiceFactory serviceFactory;
+    private final Supplier<Environment> environmentSupplier;
 
     @Inject
-    public PutTodoListResource(ServiceFactory serviceFactory) {
-        this.serviceFactory = serviceFactory;
+    public PutTodoListResource(Supplier<Environment> environmentSupplier) {
+        this.environmentSupplier = environmentSupplier;
     }
 
     @PUT
@@ -189,7 +190,7 @@ public class PutTodoListResource extends BaseResource {
         validate(todoList);
 
         RapidApiPrincipal principal = (RapidApiPrincipal) securityContext.getUserPrincipal();
-        if (serviceFactory.getTodoListService().update(principal, todoList)) {
+        if (environmentSupplier.get().getServiceFactory().getTodoListService().update(principal, todoList)) {
             return todoList;
         }
         throw new NotFoundException("List with id " + listId + " not found");

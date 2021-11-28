@@ -1,8 +1,8 @@
 package com.tutorialapi.rest.resource.v1.lists;
 
-import com.tutorialapi.db.ServiceFactory;
 import com.tutorialapi.model.TodoList;
 import com.tutorialapi.model.user.RapidApiPrincipal;
+import com.tutorialapi.rest.Environment;
 import com.tutorialapi.rest.exception.ErrorResponse;
 import com.tutorialapi.rest.resource.v1.BaseResource;
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,13 +18,15 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.SecurityContext;
 
+import java.util.function.Supplier;
+
 @Path("/v1/lists/{listId}")
 public class DeleteTodoListResource extends BaseResource {
-    private final ServiceFactory serviceFactory;
+    private final Supplier<Environment> environmentSupplier;
 
     @Inject
-    public DeleteTodoListResource(ServiceFactory serviceFactory) {
-        this.serviceFactory = serviceFactory;
+    public DeleteTodoListResource(Supplier<Environment> environmentSupplier) {
+        this.environmentSupplier = environmentSupplier;
     }
 
     @DELETE
@@ -147,7 +149,7 @@ public class DeleteTodoListResource extends BaseResource {
                                    )
                                    @PathParam("listId") String listId) {
         RapidApiPrincipal principal = (RapidApiPrincipal) securityContext.getUserPrincipal();
-        return serviceFactory.getTodoListService().delete(principal, listId)
+        return environmentSupplier.get().getServiceFactory().getTodoListService().delete(principal, listId)
                 .orElseThrow(() -> new NotFoundException("List with id " + listId + " not found"));
     }
 }

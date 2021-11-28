@@ -1,8 +1,8 @@
 package com.tutorialapi.rest.resource.v1.lists;
 
-import com.tutorialapi.db.ServiceFactory;
 import com.tutorialapi.model.TodoList;
 import com.tutorialapi.model.user.RapidApiPrincipal;
+import com.tutorialapi.rest.Environment;
 import com.tutorialapi.rest.exception.ErrorResponse;
 import com.tutorialapi.rest.resource.v1.BaseResource;
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,14 +20,15 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.SecurityContext;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 @Path("/v1/lists")
 public class GetAllTodoListsResource extends BaseResource {
-    private final ServiceFactory serviceFactory;
+    private final Supplier<Environment> environmentSupplier;
 
     @Inject
-    public GetAllTodoListsResource(ServiceFactory serviceFactory) {
-        this.serviceFactory = serviceFactory;
+    public GetAllTodoListsResource(Supplier<Environment> environmentSupplier) {
+        this.environmentSupplier = environmentSupplier;
     }
 
     @GET
@@ -124,6 +125,6 @@ public class GetAllTodoListsResource extends BaseResource {
     )
     public List<TodoList> getAllTodoLists(@Context SecurityContext securityContext) {
         RapidApiPrincipal principal = (RapidApiPrincipal) securityContext.getUserPrincipal();
-        return serviceFactory.getTodoListService().getAll(principal);
+        return environmentSupplier.get().getServiceFactory().getTodoListService().getAll(principal);
     }
 }
